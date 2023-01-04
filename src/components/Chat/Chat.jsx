@@ -3,6 +3,7 @@ import { io } from "socket.io-client";
 import authState from "../../store/auth-state.jsx";
 import axios from "axios";
 import { useParams } from "react-router";
+import "../../styles/pages/chatpage.css";
 
 const Chat = () => {
   const authContext = useContext(authState);
@@ -13,44 +14,76 @@ const Chat = () => {
   const messageInputRef = useRef();
 
   useEffect(() => {
-    const socket = io(`${import.meta.env.VITE_SOCKETS_URL}/chats`, {
-      extraHeaders: {
-        auth: `Bearer ${authContext.userData.token}`,
-      },
-    });
+    if (authContext.isLoggedIn) {
+      const socketToken = `${authContext?.userData?.token}`;
+      const socket = io(`${import.meta.env.VITE_SOCKETS_URL}/chats`, {
+        extraHeaders: {
+          auth: socketToken,
+        },
+      });
 
-    console.log(socket);
+      axios
+        .post(`${import.meta.env.VITE_BACKEND_URL}/chats/${otherUser}`)
+        .then((result) => {
+          if (result.status === 200) {
+            setSocketConnection(socket);
+            setMessages(result.data.chat.messages);
+            setChatId(result.data.chat._id);
+            console.log(`Chat id ===> `, result.data.chat._id);
+            console.log(
+              `Users IDs ===> `,
+              otherUser,
+              authContext.userData.data.id
+            );
 
-    socket.on("connect", (e) => {
-      console.log(e);
-      console.log("connected");
-    });
+            socket.emit("joinChat", {
+              chatId: result.data.chat._id,
+            });
+          }
+        })
+        .catch(console.error);
 
-    axios
-      .post(`${import.meta.env.VITE_BACKEND_URL}/chats/${otherUser}`)
-      .then((result) => {
-        if (result.status === 200) {
-          setMessages(result.data.chat.messages);
-          setChatId(result.data.chat._id);
-          console.log(`Chat id ===> `, result.data.chat._id);
-          console.log(
-            `Users IDs ===> `,
-            otherUser,
-            authContext.userData.data.id
-          );
-        }
-      })
-      .catch(console.error);
-  }, []);
+      socket.on("connect", () => {
+        console.log("connected");
+      });
+    }
+  }, [authContext.isLoggedIn]);
+
+  useEffect(() => {
+    if (authContext.isLoggedIn) {
+      socketConnection.on("sendMessage", ({ content }) => {
+        const receivedMsgObj = {
+          receiver: content.otherUserId,
+          text: content.message,
+          sender: authContext.userData.data.id,
+        };
+
+        console.log(`newMsgObj`, receivedMsgObj);
+        setMessages([...messages, { ...receivedMsgObj }]);
+        console.log(`new messages ===> `, content);
+      });
+    }
+  }, [socketConnection, messages]);
 
   const sendMessageHandler = () => {
-    console.log(socketConnection);
-    /*const message = messageInputRef.current.value;
+    const message = messageInputRef.current.value;
     socketConnection.emit("sendMessage", {
-      chatId,
-      otherUser,
-      text: message,
-    });*/
+      to: otherUser,
+      content: {
+        chatId,
+        otherUserId: otherUser,
+        message,
+      },
+    });
+    setMessages([
+      ...messages,
+      {
+        sender: authContext?.userData?.data?.id,
+        receiver: otherUser,
+        text: message,
+      },
+    ]);
+    messageInputRef.current.value = "";
   };
 
   return (
@@ -61,10 +94,13 @@ const Chat = () => {
         {messages.length === 0 ? (
           <div>You can start with chat</div>
         ) : (
-          messages?.map((msg) => (
+          messages?.map((msg, index) => (
             <div
+              key={index}
               className={
-                msg.sender === authContext.userData.data.id ? "right" : "left"
+                msg.sender === authContext?.userData?.data?.id
+                  ? "right"
+                  : "left"
               }
             >
               {msg.text}

@@ -47,7 +47,7 @@ const register = () => {
       })
       .catch((e) => {
         setErrorMessage(
-          `Field ${e.response.data.message.field} ${e.response.data.message.reason}`
+          `Field ${e.response.data.message[0].field} ${e.response.data.message[0].reason}`
         );
       });
   };

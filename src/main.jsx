@@ -13,6 +13,7 @@ import Register from "./containers/auth/register.jsx";
 import UserHome from "./components/UserHome/userHome.jsx";
 import Contact from "./components/Contact/contact.jsx";
 import Chat from "./components/Chat/Chat.jsx";
+import Profile from "./components/Profile/profile.jsx";
 
 const router = createBrowserRouter([
   {
@@ -34,6 +35,10 @@ const router = createBrowserRouter([
   {
     path: "/chat/:otherUser",
     element: [<Navbar />, <Chat />, <Footer />],
+  },
+  {
+    path: "/profile",
+    element: [<Navbar />, <Profile />, <Footer />],
   },
   {
     path: "*",

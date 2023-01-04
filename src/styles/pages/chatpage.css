@@ -1,0 +1,22 @@
+.messages-container {
+    border: 1px solid brown;
+    text-transform: none !important;
+    width: 400px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
+.messages-container .right {
+    align-self: flex-end;
+    background-color: brown;
+    border-radius: 4px;
+    padding: 4px 6px;
+}
+
+.messages-container .left {
+    align-self: flex-start;
+    background-color: brown;
+    border-radius: 4px;
+    padding: 4px 6px;
+}
