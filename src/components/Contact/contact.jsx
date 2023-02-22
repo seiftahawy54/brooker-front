@@ -1,7 +1,40 @@
 import "../../styles/pages/contact.css";
 import { Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import axios from "axios";
 
 const Contact = () => {
+  const nameInputRef = useRef();
+  const emailInputRef = useRef();
+  const messageInputRef = useRef();
+  const [serverMessage, setSeverMessage] = useState("");
+
+  const sendMessageHandler = (e) => {
+    e.preventDefault();
+    console.log(
+      nameInputRef.current.value,
+      emailInputRef.current.value,
+      messageInputRef.current.value
+    );
+
+    // Here if we have validation we apply validation here
+
+    // Send message to backend
+    const backendUrl = `${import.meta.env.VITE_BACKEND_URL}/contact`;
+    axios
+      .post(backendUrl, {
+        name: nameInputRef.current.value,
+        email: emailInputRef.current.value,
+        message: messageInputRef.current.value,
+      })
+      .then((result) => {
+        setSeverMessage("Well done message sent successfully!");
+      })
+      .catch((error) => {
+        setSeverMessage("Sorry something went wrong!");
+      });
+  };
+
   return (
     <section className="contact-section-container">
       <div>
@@ -33,6 +66,9 @@ const Contact = () => {
         </div>
         <div className="contact-form">
           <h2>Contact Us</h2>
+          <div style={{ backgroundColor: "white" }}>
+            {serverMessage?.length > 0 ? serverMessage : ""}
+          </div>
           <form className="contact" action="" method="post">
             <input
               type="text"
@@ -40,6 +76,7 @@ const Contact = () => {
               className="text-box"
               placeholder="Your Name"
               required
+              ref={nameInputRef}
             />
             <input
               type="email"
@@ -47,19 +84,23 @@ const Contact = () => {
               className="text-box"
               placeholder="Your Email"
               required
+              ref={emailInputRef}
             />
             <textarea
               name="message"
               rows="5"
               placeholder="Your Message"
               required
+              ref={messageInputRef}
             ></textarea>
-            <input
+            <button
+              onClick={sendMessageHandler}
               type="submit"
               name="submit"
               className="send-btn"
-              value="Send"
-            />
+            >
+              Send
+            </button>
           </form>
         </div>
       </div>
