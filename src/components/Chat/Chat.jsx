@@ -86,7 +86,41 @@ const Chat = () => {
     messageInputRef.current.value = "";
   };
 
+
   return (
+    <>
+      <ol className='chat'>
+        {messages.length === 0 ? (
+          <div>You can start chatting by sending a message to other user!</div>
+        ) : (
+          messages.map((msg, index) => (
+            <li
+              className={
+                msg.sender === authContext?.userData?.data?.id
+                  ? "other"
+                  : "self"
+              }>
+              <div className='msg'>{msg.text}</div>
+            </li>
+          ))
+        )}
+      </ol>
+      <div class='typezone'>
+        <form>
+          <textarea
+            type='text'
+            placeholder='Say something'
+            ref={messageInputRef}></textarea>
+          <button type='submit' className='send' onClick={sendMessageHandler}>
+            Send Message
+          </button>
+        </form>
+        <div class='emojis'></div>
+      </div>
+    </>
+  );
+
+  /* return (
     <div className={"container-fluid"}>
       <h2 className="h1">Messages</h2>
       <hr />
@@ -119,7 +153,7 @@ const Chat = () => {
         </button>
       </div>
     </div>
-  );
+  ); */
 };
 
 export default Chat;
