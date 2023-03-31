@@ -33,45 +33,47 @@ const UserHome = () => {
 
   const generatedPosts = posts.map((post) => (
     <div className={`post place2 `} key={post._id}>
-      <div className="post-top">
-        <div className="dp">
-          <img src={FirstImg} alt="" />
+      <div className='post-top'>
+        <div className='dp'>
+          <img src={FirstImg} alt='' />
         </div>
-        <div className="post-info">
-          <p className="name">{post?.seller?.username}</p>
+        <div className='post-info'>
+          <p className='name'>{post?.seller?.username}</p>
         </div>
-        <div className="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button className="btn btn-primary me-md-2  " type="button">
+        <div className='d-grid gap-2 d-md-flex justify-content-md-center'>
+          <button className='btn btn-primary me-md-2  ' type='button'>
             Edit
           </button>
         </div>
       </div>
 
-      <div className="post-content ">
+      <div className='post-content '>
         {post.title}
         <main>
-          <img
-            className="photo "
-            src={`${import.meta.env.VITE_BACKEND_STATIC}/${post.mainImg}`}
-            alt=" "
-          />
+          <Link to={`/post/${post?._id}`}>
+            <img
+              className='photo '
+              src={`${import.meta.env.VITE_BACKEND_STATIC}/${post.mainImg}`}
+              alt=' '
+            />
+          </Link>
         </main>
         <main>
           {post.images.map((img) => (
             <img
-              className="photo "
+              className='photo '
               src={`${import.meta.env.VITE_BACKEND_STATIC}/${img}`}
-              alt=" "
+              alt=' '
             />
           ))}
         </main>
       </div>
 
-      <div className="post-bottom ">
-        <div className="action ">
+      <div className='post-bottom '>
+        <div className='action '>
           <FontAwesomeIcon icon={faHeart} /> <span>favorite</span>
         </div>
-        <div className="action ">
+        <div className='action '>
           {post?.seller?._id !== authContext?.userData?.data?.id && (
             <Link to={`/chat/${post?.seller?._id}`} className={"btn btn-info"}>
               <FontAwesomeIcon icon={faSms} /> Chat
@@ -83,28 +85,28 @@ const UserHome = () => {
   ));
 
   return (
-    <div className="place">
-      <div className="post create">
-        <div className="post-top">
-          <div className="dp">
-            <img src={FirstImg} alt="" />
+    <div className='place'>
+      <div className='post create'>
+        <div className='post-top'>
+          <div className='dp'>
+            <img src={FirstImg} alt='' />
           </div>
           <input
-            type="text"
+            type='text'
             placeholder={`What's on your mind, ${authContext.userData?.data?.username} ?`}
           />
         </div>
 
-        <div className="post-bottom">
-          <div className="action">
+        <div className='post-bottom'>
+          <div className='action'>
             <FontAwesomeIcon icon={faVideo} />
             <span> video</span>
           </div>
-          <div className="action">
+          <div className='action'>
             <FontAwesomeIcon icon={faImage} />
             <span>Photo</span>
           </div>
-          <button type="button" className={"btn mt-4"}>
+          <button type='button' className={"btn mt-4"}>
             add post
           </button>
         </div>

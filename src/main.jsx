@@ -14,6 +14,7 @@ import UserHome from "./components/UserHome/userHome.jsx";
 import Contact from "./components/Contact/contact.jsx";
 import Chat from "./components/Chat/Chat.jsx";
 import Profile from "./components/Profile/profile.jsx";
+import SinglePost from "./components/Posts/SinglePost/SinglePost.jsx";
 
 const router = createBrowserRouter([
   {
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
   {
     path: "/profile",
     element: [<Navbar />, <Profile />, <Footer />],
+  },
+  {
+    path: "/post/:postId",
+    element: [<Navbar />, <SinglePost />,<Footer />]
   },
   {
     path: "*",
