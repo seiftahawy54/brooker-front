@@ -2,125 +2,200 @@ import "../../styles/pages/userhome.css";
 import FirstImg from "../../assets/images/dp.jpg";
 import { useContext, useEffect, useState } from "react";
 import authState from "../../store/auth-state.jsx";
-import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faHeart,
-  faImage,
-  faSms,
-  faVideo,
+    faHeart,
+    faSms
 } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
+import { useLocation, useNavigate } from "react-router";
 
 const UserHome = () => {
-  const authContext = useContext(authState);
-  const [posts, setPosts] = useState([]);
+    const authContext = useContext(authState);
+    const [posts, setPosts] = useState([]);
+    const [favPosts, setFavPosts] = useState([]);
+    const [isPostFavStateChanged, setPostChange] = useState(Math.random());
+    const navigate = useNavigate();
+    const location = useLocation();
 
-  useEffect(() => {
-    const backendUrl = `${import.meta.env.VITE_BACKEND_URL}/posts`;
-    const Authentication = `Bearer ${authContext.userData["token"]}`;
-    axios
-      .get(backendUrl, {
-        headers: {
-          Authorization: Authentication,
-        },
-      })
-      .then((result) => {
-        setPosts(result.data.posts);
-      })
-      .catch(console.error);
-  }, [authContext.isLoggedIn]);
+    useEffect(() => {
+        const backendUrl = `${import.meta.env.VITE_BACKEND_URL}/posts`;
+        if (authContext.isLoggedIn) {
+            axios
+                .get(backendUrl)
+                .then((result) => {
+                    setPosts(result.data.posts);
+                })
+                .catch((err) => {
+                    toast.error(err.message);
+                    console.log(`this is server error ${err.message}`);
+                });
 
-  const generatedPosts = posts.map((post) => (
-    <div className={`post place2 `} key={post._id}>
-      <div className='post-top'>
-        <div className='dp'>
-          <img src={FirstImg} alt='' />
-        </div>
-        <div className='post-info'>
-          <p className='name'>{post?.seller?.username}</p>
-        </div>
-        <div className='d-grid gap-2 d-md-flex justify-content-md-center'>
-          <button className='btn btn-primary me-md-2  ' type='button'>
-            Edit
-          </button>
-        </div>
-      </div>
+            axios
+                .get(`${import.meta.env.VITE_BACKEND_URL}/users/favouritePosts/`)
+                .then((result) => {
+                    setFavPosts(result.data.favouritePosts);
+                })
+                .catch((err) => {
+                    console.log(err);
+                    toast.error("Couldn't fetch favourite posts");
+                });
+        }
+    }, [authContext.isLoggedIn, isPostFavStateChanged]);
 
-      <div className='post-content '>
-        {post.title}
-        <main>
-          <Link to={`/post/${post?._id}`}>
-            <img
-              className='photo '
-              src={`${import.meta.env.VITE_BACKEND_STATIC}/${post.mainImg}`}
-              alt=' '
-            />
-          </Link>
-        </main>
-        <main>
-          {post.images.map((img) => (
-            <img
-              className='photo '
-              src={`${import.meta.env.VITE_BACKEND_STATIC}/${img}`}
-              alt=' '
-            />
-          ))}
-        </main>
-      </div>
+    const togglePostToFavHandler = async (e) => {
+        const postId = e.target.getAttribute("data-post-id");
+        const postIndex = posts.findIndex(
+            (post) => post._id === postId
+        );
+        if (
+            authContext?.userData?.data?.username === posts[postIndex].seller.username
+        ) {
+            toast.error("You are the owner of this post!");
+            return;
+        }
 
-      <div className='post-bottom '>
-        <div className='action '>
-          <FontAwesomeIcon icon={faHeart} /> <span>favorite</span>
-        </div>
-        <div className='action '>
-          {post?.seller?._id !== authContext?.userData?.data?.id && (
-            <Link to={`/chat/${post?.seller?._id}`} className={"btn btn-info"}>
-              <FontAwesomeIcon icon={faSms} /> Chat
-            </Link>
-          )}
-        </div>
-      </div>
-    </div>
-  ));
 
-  return (
-    <div className='place'>
-      <div className='post create'>
-        <div className='post-top'>
-          <div className='dp'>
-            <img src={FirstImg} alt='' />
-          </div>
-          <input
-            type='text'
-            placeholder={`What's on your mind, ${authContext.userData?.data?.username} ?`}
-          />
-        </div>
+        setPostChange(Math.random());
+        if (isPostFavourite(postId)) {
+            axios
+                .delete(`${import.meta.env.VITE_BACKEND_URL}/users/deleteFavourite/${postId}`)
+                .then((result) => {
+                    toast.success("post deleted from favourites successfully");
+                })
+                .catch((err) => {
+                    toast.error("Couldn't delete post from favourite");
+                    console.error(err);
+                });
 
-        <div className='post-bottom'>
-          <div className='action'>
-            <FontAwesomeIcon icon={faVideo} />
-            <span> video</span>
-          </div>
-          <div className='action'>
-            <FontAwesomeIcon icon={faImage} />
-            <span>Photo</span>
-          </div>
-          <button type='button' className={"btn mt-4"}>
-            add post
-          </button>
+        } else {
+            axios
+                .put(`${import.meta.env.VITE_BACKEND_URL}/users/favouritePosts/${postId}`)
+                .then((result) => {
+                    toast.success("post added to favourites successfully");
+                })
+                .catch((err) => {
+                    toast.error("Couldn't add post to favourite");
+                    console.error(err);
+                });
+        }
+    };
+
+    const isPostFavourite = (postId) => {
+        return favPosts.findIndex(post => post._id === postId) > -1;
+    };
+
+    const getPostsToRender = location.pathname === "/favourite" ? favPosts : posts;
+
+    const generatedPosts = getPostsToRender.map((post) => (
+        <div className={`post place2 `} key={post._id}>
+            {isPostFavourite(post._id) && <i className="fa fa-bookmark"></i>}
+            <div className="post-top">
+                <div className="dp">
+                    {/* -> User image */}
+                    <img src={FirstImg} alt="" />
+                </div>
+                <div className="post-info">
+                    <p className="fs-2">{post.seller.username}</p>
+                </div>
+                <div className="d-grid gap-2 d-md-flex justify-content-md-center">
+                    {authContext?.userData?.data?.username === post.seller.username && (
+                        <button className="btn btn-primary me-md-2  " type="button">
+                            Edit
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            <div className="post-content ">
+                {post.title} <br />${post.price}
+                <main>
+                    <Link to={`/post/${post?._id}`}>
+                        <img
+                            className="photo "
+                            src={`${import.meta.env.VITE_BACKEND_STATIC}/${post.mainImg}`}
+                            alt=" "
+                        />
+                    </Link>
+                </main>
+                <main>
+                    {post.images.map((img, index) => (
+                        <img
+                            key={index}
+                            className="photo "
+                            src={`${import.meta.env.VITE_BACKEND_STATIC}/${img}`}
+                            alt=" "
+                        />
+                    ))}
+                </main>
+            </div>
+
+            <div className="post-bottom ">
+                {authContext?.userData?.data?.username !== post.seller.username && (
+                    <div className="action ">
+                        <button
+                            className={"btn"}
+                            onClick={togglePostToFavHandler}
+                            data-post-id={post._id}
+                        >
+                            {isPostFavourite(post._id) ? (
+                                <>
+                                    <FontAwesomeIcon icon={faHeart} /> &nbsp; Un Favourite
+                                </>
+                            ) : (
+                                <>
+                                    <FontAwesomeIcon icon={faHeart} /> &nbsp; Favorite
+                                </>
+                            )}
+                        </button>
+                    </div>
+                )}
+                <div className="action ">
+                    {authContext?.userData?.data?.username !== post.seller.username && (
+                        <Link to={`/chat/${post.seller._id}`} className={"btn btn-info"}>
+                            <FontAwesomeIcon icon={faSms} /> Chat
+                        </Link>
+                    )}
+                </div>
+            </div>
         </div>
-      </div>
-      {generatedPosts?.length === 0 ? (
-        <div>
-          You Don't have any posts go and add one !{" "}
-          <Link to={"/addPost"}>Add Post</Link>{" "}
+    ));
+
+    return (
+        <div className="place">
+            {location.pathname !== "/favourite"
+                &&
+                <div className="post create">
+                    <div className="post-top">
+                        <div className="dp">
+                            <img src={FirstImg} alt="" />
+                        </div>
+                        {authContext?.userData?.data?.username}
+                        <button
+                            type="button"
+                            className={"btn mt-4"}
+                            onClick={() => navigate("/addPost")}
+                        >
+                            add post
+                        </button>
+                    </div>
+                </div>
+            }
+
+            {generatedPosts?.length === 0 ? (
+                <div>
+                    You Don't have any posts go and add one !{" "}
+                    <Link to={"/addPost"}>Add Post</Link>{" "}
+                </div>
+            ) : (
+                generatedPosts
+            )}
+            <ToastContainer />
         </div>
-      ) : (
-        generatedPosts
-      )}
-    </div>
-  );
+    );
 };
 
 export default UserHome;

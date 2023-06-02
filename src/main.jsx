@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Homepage from "./Homepage.jsx";
@@ -19,6 +19,7 @@ import SinglePost from "./components/Posts/SinglePost/SinglePost.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
+    loader: () => (<p>Loading.....</p>),
     element: [<Navbar />, <Homepage />, <Footer />],
   },
   {
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
   },
   {
     path: "/homepage",
+    element: [<Navbar />, <UserHome />],
+  },
+  {
+    path: "/favourite",
     element: [<Navbar />, <UserHome />],
   },
   {
@@ -43,7 +48,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/post/:postId",
-    element: [<Navbar />, <SinglePost />,<Footer />]
+    element: [<Navbar />, <SinglePost />, <Footer />],
   },
   {
     path: "*",
@@ -54,6 +59,7 @@ const router = createBrowserRouter([
     ],
   },
 ]);
+
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

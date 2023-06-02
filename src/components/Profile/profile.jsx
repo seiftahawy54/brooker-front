@@ -1,7 +1,27 @@
 import "../../styles/pages/profile.css";
-import UserImg from '../../assets/images/dp.jpg'
+import UserImg from "../../assets/images/dp.jpg";
+import { useContext, useEffect, useState } from "react";
+import authState from "../../store/auth-state.jsx";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 const Profile = () => {
+  const authContext = useContext(authState)
+  const [userData, setUserData] = useState({})
+
+  useEffect(() => {
+    if (authContext.isLoggedIn) {
+      axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/settings/profile`)
+          .then(result => {
+            setUserData(result.data.user)
+          })
+          .catch(err => {
+            toast.error(err.message)
+          })
+    }
+  }, [authContext.isLoggedIn])
+
   return (
     <section className={"profile-section"}>
       <div className="container">
@@ -14,15 +34,16 @@ const Profile = () => {
 
                   <div className="profile-header-content">
                     <div className="profile-header-img">
-                      <img src={UserImg} alt="" />
+                      <img src={userData.avatar && UserImg} alt={userData.username} />
                     </div>
 
                     <div className="profile-header-info">
-                      <h4 className="m-t-10 m-b-5">dean</h4>
-                      <p className="m-b-10">hunter</p>
-                      <a href="" className="btn btn-sm btn-info mb-2">
+                      <h4 className="m-t-10 m-b-5">
+                        {userData.fullname}
+                      </h4>
+                      <Link to={'/editProfile'} className="btn btn-sm btn-info mb-2">
                         Edit Profile
-                      </a>
+                      </Link>
                     </div>
                   </div>
 
@@ -32,17 +53,7 @@ const Profile = () => {
                         POSTS
                       </a>
                     </li>
-                    <li className="nav-item">
-                      <a href="" target="__blank" className="nav-link_">
-                        PHOTOS
-                      </a>
-                    </li>
-                    <li className="nav-item">
-                      <a href="" target="__blank" className="nav-link_">
-                        VIDEOS
-                      </a>
-                    </li>
-                    <li className="nav-item">
+                    <li>
                       <a href="" target="__blank" className="nav-link_">
                         CHAT
                       </a>

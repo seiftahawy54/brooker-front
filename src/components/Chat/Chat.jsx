@@ -86,10 +86,9 @@ const Chat = () => {
     messageInputRef.current.value = "";
   };
 
-
   return (
     <>
-      <ol className='chat'>
+      <ol className="chat">
         {messages.length === 0 ? (
           <div>You can start chatting by sending a message to other user!</div>
         ) : (
@@ -99,23 +98,25 @@ const Chat = () => {
                 msg.sender === authContext?.userData?.data?.id
                   ? "other"
                   : "self"
-              }>
-              <div className='msg'>{msg.text}</div>
+              }
+            >
+              <div className="msg">{msg.text}</div>
             </li>
           ))
         )}
       </ol>
-      <div class='typezone'>
+      <div className="typezone">
         <form>
           <textarea
-            type='text'
-            placeholder='Say something'
-            ref={messageInputRef}></textarea>
-          <button type='submit' className='send' onClick={sendMessageHandler}>
+            type="text"
+            placeholder="Say something"
+            ref={messageInputRef}
+          ></textarea>
+          <button type="submit" className="send" onClick={sendMessageHandler}>
             Send Message
           </button>
         </form>
-        <div class='emojis'></div>
+        <div className="emojis"></div>
       </div>
     </>
   );

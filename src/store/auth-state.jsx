@@ -10,7 +10,7 @@ const AuthContext = createContext({
 });
 
 const AuthContextProvider = (props) => {
-  const [loginState, setLoginState] = useState(false);
+  const [loginState, setLoginState] = useState();
   const [userData, setUserData] = useState({});
 
   useEffect(() => {
