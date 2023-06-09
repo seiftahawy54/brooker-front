@@ -15,11 +15,17 @@ import Contact from "./components/Contact/contact.jsx";
 import Chat from "./components/Chat/Chat.jsx";
 import Profile from "./components/Profile/profile.jsx";
 import SinglePost from "./components/Posts/SinglePost/SinglePost.jsx";
+import AddPost from './containers/posts/addPost.jsx';
+/* Toast data */
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
+import DashboardPosts from "./components/Dashboard/ReviewPosts.jsx";
+import DashboardNav from "./components/Dashboard/DashboardNav.jsx";
+import DashboardUsers from "./components/Dashboard/AllUsers.jsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    loader: () => (<p>Loading.....</p>),
     element: [<Navbar />, <Homepage />, <Footer />],
   },
   {
@@ -51,6 +57,26 @@ const router = createBrowserRouter([
     element: [<Navbar />, <SinglePost />, <Footer />],
   },
   {
+    path: "/addPost",
+    element: [<Navbar />, <AddPost />, <Footer />]
+  },
+  {
+    path: "/dashboard",
+    element: [<Navbar />, <DashboardNav />],
+  },
+  {
+    path: '/dashboard/posts/reviewPosts',
+    element: [<Navbar />, <DashboardPosts />],
+  },
+  {
+    path: '/dashboard/posts/',
+    element: [<Navbar />, <DashboardPosts />],
+  },
+  {
+    path: '/dashboard/users/',
+    element: [<Navbar />, <DashboardUsers />],
+  },
+  {
     path: "*",
     element: [
       <Navbar />,
@@ -66,5 +92,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <AuthContextProvider>
       <RouterProvider router={router}></RouterProvider>
     </AuthContextProvider>
+    <ToastContainer />
   </React.StrictMode>
 );

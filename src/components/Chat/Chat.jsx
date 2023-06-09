@@ -51,7 +51,7 @@ const Chat = () => {
 
   useEffect(() => {
     if (authContext.isLoggedIn) {
-      socketConnection.on("sendMessage", ({ content }) => {
+      socketConnection?.on("sendMessage", ({ content }) => {
         const receivedMsgObj = {
           receiver: content.otherUserId,
           text: content.message,

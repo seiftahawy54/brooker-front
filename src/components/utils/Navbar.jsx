@@ -2,6 +2,8 @@ import { NavLink } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import AuthContext from "../../store/auth-state.jsx";
 import { useNavigate } from "react-router";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const Navbar = () => {
     const authContext = useContext(AuthContext);
@@ -29,11 +31,20 @@ const Navbar = () => {
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink to="/addPost" >
-                            <span className={'fa fa-plus-circle'}></span> &nbsp;
+                        <NavLink to="/addPost">
+                            <span className={"fa fa-plus-circle"}></span> &nbsp;
                             Add Post
                         </NavLink>
                     </li>
+                    {
+                        authContext.userData.data.role === 'admin' &&
+                        <li>
+                            <NavLink to="/dashboard">
+                                <span className={"fa fa-toolbox"}></span> &nbsp;
+                                Dashboard
+                            </NavLink>
+                        </li>
+                    }
                     <li>
                         <a
                             onClick={() => {

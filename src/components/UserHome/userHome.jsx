@@ -8,43 +8,45 @@ import {
     faSms
 } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router";
 
-const UserHome = () => {
+const UserHome = (props) => {
     const authContext = useContext(authState);
     const [posts, setPosts] = useState([]);
     const [favPosts, setFavPosts] = useState([]);
-    const [isPostFavStateChanged, setPostChange] = useState(Math.random());
+    const [isPostFavStateChanged, setPostChange] = useState(0);
     const navigate = useNavigate();
     const location = useLocation();
 
-    useEffect(() => {
-        const backendUrl = `${import.meta.env.VITE_BACKEND_URL}/posts`;
-        if (authContext.isLoggedIn) {
-            axios
-                .get(backendUrl)
-                .then((result) => {
-                    setPosts(result.data.posts);
-                })
-                .catch((err) => {
-                    toast.error(err.message);
-                    console.log(`this is server error ${err.message}`);
-                });
+    const backendUrl = `${import.meta.env.VITE_BACKEND_URL}/posts`;
+    const fetchNormalPosts = () => axios
+        .get(backendUrl)
+        .then((result) => {
+            setPosts(result.data.posts);
+        })
+        .catch((err) => {
+            toast.error(err.message);
+            console.log(`this is server error ${err.message}`);
+        });
 
-            axios
-                .get(`${import.meta.env.VITE_BACKEND_URL}/users/favouritePosts/`)
-                .then((result) => {
-                    setFavPosts(result.data.favouritePosts);
-                })
-                .catch((err) => {
-                    console.log(err);
-                    toast.error("Couldn't fetch favourite posts");
-                });
+    const fetchFavPosts = () => axios
+        .get(`${import.meta.env.VITE_BACKEND_URL}/users/favouritePosts/`)
+        .then((result) => {
+            setFavPosts(result.data.favouritePosts);
+        })
+        .catch((err) => {
+            console.log(err);
+            toast.error("Couldn't fetch favourite posts");
+        });
+
+    useEffect(() => {
+        if (authContext.isLoggedIn) {
+            fetchNormalPosts();
+            fetchFavPosts();
         }
-    }, [authContext.isLoggedIn, isPostFavStateChanged]);
+    }, [authContext.isLoggedIn, favPosts]);
 
     const togglePostToFavHandler = async (e) => {
         const postId = e.target.getAttribute("data-post-id");
@@ -59,7 +61,6 @@ const UserHome = () => {
         }
 
 
-        setPostChange(Math.random());
         if (isPostFavourite(postId)) {
             axios
                 .delete(`${import.meta.env.VITE_BACKEND_URL}/users/deleteFavourite/${postId}`)
@@ -82,13 +83,14 @@ const UserHome = () => {
                     console.error(err);
                 });
         }
-    };
 
+        fetchFavPosts()
+    };
     const isPostFavourite = (postId) => {
         return favPosts.findIndex(post => post._id === postId) > -1;
     };
 
-    const getPostsToRender = location.pathname === "/favourite" ? favPosts : posts;
+    const getPostsToRender = location.pathname === "/favourite" || props.isFromProfile ? favPosts : posts;
 
     const generatedPosts = getPostsToRender.map((post) => (
         <div className={`post place2 `} key={post._id}>
@@ -112,6 +114,20 @@ const UserHome = () => {
 
             <div className="post-content ">
                 {post.title} <br />${post.price}
+                <main>
+                    Specifications:
+                    <ol>
+                        <li>
+                            Size: {post.flatSpecs.space}
+                        </li>
+                        <li>
+                            Number of rooms: {post.flatSpecs.numberOfRooms}
+                        </li>
+                        <li>
+                            Type : {post.flatSpecs.flatType}
+                        </li>
+                    </ol>
+                </main>
                 <main>
                     <Link to={`/post/${post?._id}`}>
                         <img
@@ -166,7 +182,8 @@ const UserHome = () => {
 
     return (
         <div className="place">
-            {location.pathname !== "/favourite"
+            {
+                location.pathname === "/homepage"
                 &&
                 <div className="post create">
                     <div className="post-top">
@@ -193,7 +210,6 @@ const UserHome = () => {
             ) : (
                 generatedPosts
             )}
-            <ToastContainer />
         </div>
     );
 };
