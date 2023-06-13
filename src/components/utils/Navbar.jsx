@@ -19,6 +19,12 @@ const Navbar = () => {
             setAuthState(
                 <>
                     <li>
+                        <NavLink to="/homepage">
+                            <span className="fa fa-home"></span> &nbsp;
+                            Homepage
+                        </NavLink>
+                    </li>
+                    <li>
                         <NavLink to="/profile">
                             <span className="fa fa-user-alt"></span> &nbsp;
                             {authContext?.userData?.data?.username}
@@ -37,7 +43,7 @@ const Navbar = () => {
                         </NavLink>
                     </li>
                     {
-                        authContext.userData.data.role === 'admin' &&
+                        authContext?.userData?.data?.role === 'admin' &&
                         <li>
                             <NavLink to="/dashboard">
                                 <span className={"fa fa-toolbox"}></span> &nbsp;
@@ -78,10 +84,10 @@ const Navbar = () => {
                     <form className="search" action="search">
                         <input name="q" placeholder="Search..." type="search" />
                     </form>
+                    {authState}
                     <li className="dropdown">
                         <NavLink to="/contact">Contact us</NavLink>
                     </li>
-                    {authState}
                 </ul>
             </nav>
         </div>

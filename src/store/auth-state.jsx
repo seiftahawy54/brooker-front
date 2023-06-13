@@ -5,12 +5,12 @@ import { useNavigate } from "react-router";
 const AuthContext = createContext({
   isLoggedIn: false,
   onLogout: () => {},
-  onLogin: () => {},
+  onLogin: async () => {},
   userData: {},
 });
 
 const AuthContextProvider = (props) => {
-  const [loginState, setLoginState] = useState();
+  const [loginState, setLoginState] = useState(false);
   const [userData, setUserData] = useState({});
 
   useEffect(() => {
@@ -20,13 +20,24 @@ const AuthContextProvider = (props) => {
         token: localStorage.getItem("userToken"),
         data: JSON.parse(localStorage.getItem("userData")),
       });
-      axios.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${localStorage.getItem("userToken")}`;
     } else {
       setLoginState(false);
     }
   }, []);
+
+  useEffect(() => {
+    if (typeof localStorage.getItem("userToken") === 'string') {
+      axios.defaults.headers.common[
+          "Authorization"
+          ] = `Bearer ${localStorage.getItem("userToken")}`;
+    }
+
+    if (loginState) {
+      axios.defaults.headers.common[
+          "Authorization"
+          ] = `Bearer ${userData.token}`;
+    }
+  }, [loginState])
 
   const logoutHandler = () => {
     setLoginState(false);
@@ -35,11 +46,17 @@ const AuthContextProvider = (props) => {
   };
 
   const loginHandler = () => {
-    setLoginState(true);
-    setUserData({
-      token: localStorage.getItem("userToken"),
-      data: JSON.parse(localStorage.getItem("userData")),
-    });
+    return new Promise((resolve, reject) => {
+      setLoginState(true);
+      setUserData({
+        token: localStorage.getItem("userToken"),
+        data: JSON.parse(localStorage.getItem("userData")),
+      });
+
+      setTimeout(() => {
+        resolve();
+      }, 300)
+    })
   };
 
   return (

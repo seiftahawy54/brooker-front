@@ -42,6 +42,10 @@ const UserHome = (props) => {
         });
 
     useEffect(() => {
+
+    }, [])
+
+    useEffect(() => {
         if (authContext.isLoggedIn) {
             fetchNormalPosts();
             fetchFavPosts();

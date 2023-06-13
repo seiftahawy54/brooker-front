@@ -670,3 +670,83 @@ select.form-control:not([size]):not([multiple]) {
 .text-red {
   color: #ff5b57 !important;
 }
+
+aside.chat {
+  width: 550px;
+  height: 800px;
+  background-color: #3b3e49;
+  display: inline-block;
+  font-size: 15px;
+  vertical-align: top;
+}
+
+
+aside.chat header {
+  padding: 30px 20px;
+}
+
+aside.chat input {
+  width: 100%;
+  height: 50px;
+  line-height: 50px;
+  padding: 0 50px 0 20px;
+  background-color: #5e616a;
+  border: none;
+  border-radius: 3px;
+  color: #fff;
+  background-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/1940306/ico_search.png);
+  background-repeat: no-repeat;
+  background-position: right;
+  background-size: 40px;
+}
+
+aside.chat input::placeholder {
+  color: #fff;
+}
+
+aside.chat ul {
+  padding-left: 0;
+  margin: 0;
+  list-style-type: none;
+  overflow-y: scroll;
+  height: 690px;
+}
+
+aside.chat li {
+  padding: 10px 0;
+  cursor: pointer;
+}
+
+aside.chat li:hover {
+  background-color: #5e616a;
+}
+
+
+aside li img {
+  border-radius: 50%;
+  margin-left: 20px;
+  margin-right: 8px;
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+}
+
+aside li div {
+  vertical-align: top;
+  display: flex;
+  align-content: center;
+  align-items: center;
+}
+
+aside li h2 {
+  font-size: 14px;
+  color: #fff;
+  font-weight: normal;
+  margin-bottom: 5px;
+}
+
+aside li h3 {
+  font-size: 12px;
+  color: #7e818a;
+  font-weight: normal;
+}

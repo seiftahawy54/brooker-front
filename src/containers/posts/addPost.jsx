@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
+import '../../styles/pages/addpost.css'
 
 const addPost = () => {
 
@@ -62,70 +63,69 @@ const addPost = () => {
     };
 
     return (
-        <>
-            {
-                errorMessage.length > 0 &&
-                (
-                    <div className="alert alert-danger">
-                        {errorMessage}
-                    </div>
-                )
-            }
-            {
+        <div className={'add-post-container'}>
+            <section className={"addpost"}>
+                {
+                    errorMessage.length > 0 &&
+                    (
+                        <div className="alert alert-danger">
+                            {errorMessage}
+                        </div>
+                    )
+                }
+                {
 
-            }
-            <form>
-                <div>
-                    <input type="text" placeholder="Title" ref={titleRef} />
-                </div>
-                <div>
-                    <input type="number" placeholder="Price" min={100} ref={priceRef} />
-                </div>
-
-                <div>
-                    <div>Main Picture</div>
-                    <input type="file" onChange={handleUploadOneImg} />
-                </div>
-                <div>
-                    <input type="file" multiple={true} onChange={handleUploadManyImgs} />
-                </div>
-
-                <div>
-                    Type
-                    <select name="" id="" ref={flatTypesRef}>
-                        <option value="single">
-                            Single
-                        </option>
-                        <option value="double">
-                            Double
-                        </option>
-                        <option value="villa">
-                            Villa
-                        </option>
-                    </select>
-                </div>
-
-
-                <div>
+                }
+                <form>
                     <div>
-                        Space
+                        ADD YOUR TITLE:  &nbsp; <input type="text" placeholder="Title" ref={titleRef} />
                     </div>
-                    <input type="number" placeholder={"Please enter the size"} ref={spaceRef} />
-                </div>
-
-                <div>
+                    <br />
                     <div>
-                        Number of rooms
+                        ADD YOUR PRICE:  &nbsp; <input type="number" placeholder="Price" min={100} ref={priceRef} />
                     </div>
-                    <input type="number" placeholder={"Number of rooms"} ref={numberOfRoomsRef} />
-                </div>
-
-                <button className={"btn btn-primary"} disabled={submitStatus} onClick={submitPostHandler}>
-                    Submit
-                </button>
-            </form>
-            {/*<ToastContainer />*/}
-        </>
+                    <br />
+                    <div>
+                        Main Picture : &nbsp;
+                        <input type="file" onChange={handleUploadOneImg} />
+                    </div>
+                    <br />
+                    <div>
+                        Detailed Pictures: <input type="file" multiple={true} onChange={handleUploadManyImgs} />
+                    </div>
+                    <br />
+                    <div>
+                        Type : &nbsp;
+                        <select name="" id="" ref={flatTypesRef}>
+                            <option value="single">
+                                Single
+                            </option>
+                            <option value="double">
+                                Double
+                            </option>
+                            <option value="villa">
+                                Villa
+                            </option>
+                        </select>
+                    </div>
+                    <br />
+                    <div>
+                            Space :  &nbsp;
+                        <input type="number" placeholder={"Please enter the size"} ref={spaceRef} />
+                    </div>
+                    <br />
+                    <div>
+                            Number of rooms : &nbsp;
+                        <input type="number" placeholder={"Number of rooms"} ref={numberOfRoomsRef} />
+                    </div>
+                    <br />
+                    <button className={"btn btn-primary"} disabled={submitStatus} onClick={submitPostHandler}>
+                        Submit
+                    </button>
+                </form>
+                {/*<ToastContainer />*/}
+            </section>
+        </div>
     );
 };
 

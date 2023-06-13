@@ -5,9 +5,10 @@ import axios from "axios";
 import { useParams } from "react-router";
 import "../../styles/pages/chatpage.css";
 
-const Chat = () => {
+const Chat = (props) => {
   const authContext = useContext(authState);
-  const { otherUser } = useParams();
+  const otherUser = props.otherUserId;
+  console.log(otherUser)
   const [chatId, setChatId] = useState("");
   const [messages, setMessages] = useState([]);
   const [socketConnection, setSocketConnection] = useState({});
@@ -29,12 +30,7 @@ const Chat = () => {
             setSocketConnection(socket);
             setMessages(result.data.chat.messages);
             setChatId(result.data.chat._id);
-            console.log(`Chat id ===> `, result.data.chat._id);
-            console.log(
-              `Users IDs ===> `,
-              otherUser,
-              authContext.userData.data.id
-            );
+            console.log(socket);
 
             socket.emit("joinChat", {
               chatId: result.data.chat._id,
@@ -47,10 +43,10 @@ const Chat = () => {
         console.log("connected");
       });
     }
-  }, [authContext.isLoggedIn]);
+  }, [otherUser]);
 
   useEffect(() => {
-    if (authContext.isLoggedIn) {
+    if (Object.keys(socketConnection).length > 0) {
       socketConnection?.on("sendMessage", ({ content }) => {
         const receivedMsgObj = {
           receiver: content.otherUserId,
@@ -88,7 +84,7 @@ const Chat = () => {
 
   return (
     <>
-      <ol className="chat">
+      <ol className="chat w-100">
         {messages.length === 0 ? (
           <div>You can start chatting by sending a message to other user!</div>
         ) : (
@@ -121,40 +117,6 @@ const Chat = () => {
     </>
   );
 
-  /* return (
-    <div className={"container-fluid"}>
-      <h2 className="h1">Messages</h2>
-      <hr />
-      <div className={"messages-container"}>
-        {messages.length === 0 ? (
-          <div>You can start with chat</div>
-        ) : (
-          messages?.map((msg, index) => (
-            <div
-              key={index}
-              className={
-                msg.sender === authContext?.userData?.data?.id
-                  ? "right"
-                  : "left"
-              }
-            >
-              {msg.text}
-            </div>
-          ))
-        )}
-      </div>
-      <div>
-        <input
-          type="text"
-          placeholder={"Write message"}
-          ref={messageInputRef}
-        />{" "}
-        <button className={"btn"} onClick={sendMessageHandler}>
-          send message
-        </button>
-      </div>
-    </div>
-  ); */
 };
 
 export default Chat;
