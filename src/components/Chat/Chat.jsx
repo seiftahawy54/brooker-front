@@ -4,11 +4,15 @@ import authState from "../../store/auth-state.jsx";
 import axios from "axios";
 import { useParams } from "react-router";
 import "../../styles/pages/chatpage.css";
+import { useSearchParams } from "react-router-dom";
 
 const Chat = (props) => {
   const authContext = useContext(authState);
-  const otherUser = props.otherUserId;
-  console.log(otherUser)
+  let globalOtherUser = props.otherUserId;
+  if (!globalOtherUser) {
+    const {otherUser} = useParams();
+    globalOtherUser = otherUser
+  }
   const [chatId, setChatId] = useState("");
   const [messages, setMessages] = useState([]);
   const [socketConnection, setSocketConnection] = useState({});
@@ -24,7 +28,7 @@ const Chat = (props) => {
       });
 
       axios
-        .post(`${import.meta.env.VITE_BACKEND_URL}/chats/${otherUser}`)
+        .post(`${import.meta.env.VITE_BACKEND_URL}/chats/${globalOtherUser}`)
         .then((result) => {
           if (result.status === 200) {
             setSocketConnection(socket);
@@ -43,7 +47,7 @@ const Chat = (props) => {
         console.log("connected");
       });
     }
-  }, [otherUser]);
+  }, [authContext.isLoggedIn, props.otherUserId]);
 
   useEffect(() => {
     if (Object.keys(socketConnection).length > 0) {
@@ -59,15 +63,17 @@ const Chat = (props) => {
         console.log(`new messages ===> `, content);
       });
     }
-  }, [socketConnection, messages]);
+  }, [socketConnection]);
+
+  useEffect(() => {}, [messages])
 
   const sendMessageHandler = () => {
     const message = messageInputRef.current.value;
     socketConnection.emit("sendMessage", {
-      to: otherUser,
+      to: globalOtherUser,
       content: {
         chatId,
-        otherUserId: otherUser,
+        otherUserId: globalOtherUser,
         message,
       },
     });
@@ -75,7 +81,7 @@ const Chat = (props) => {
       ...messages,
       {
         sender: authContext?.userData?.data?.id,
-        receiver: otherUser,
+        receiver: globalOtherUser,
         text: message,
       },
     ]);
@@ -102,7 +108,7 @@ const Chat = (props) => {
         )}
       </ol>
       <div className="typezone">
-        <form>
+        <form onSubmit={(e) => e.preventDefault()}>
           <textarea
             type="text"
             placeholder="Say something"
