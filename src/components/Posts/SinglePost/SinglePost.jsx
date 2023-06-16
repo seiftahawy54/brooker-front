@@ -9,7 +9,6 @@ const SinglePost = () => {
   useEffect(() => {
     axios(`${import.meta.env.VITE_BACKEND_URL}/posts/${postId}`).then(
       ({ data }) => {
-        console.log(data.post.mainImg);
         setImageLink(data.post.mainImg);
       }
     );

@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import AuthContext from "../../store/auth-state.jsx";
 import { useNavigate } from "react-router";
 import axios from "axios";
@@ -13,6 +13,10 @@ const Navbar = () => {
             <NavLink to="/register">Login</NavLink>
         </li>
     );
+    const searchInputRef = useRef()
+    const searchHandler = () => {
+        navigate(`/search?kw=${searchInputRef.current.value}`)
+    }
 
     useEffect(() => {
         if (authContext.isLoggedIn) {
@@ -82,7 +86,7 @@ const Navbar = () => {
             <nav>
                 <ul>
                     <form className="search" action="search">
-                        <input name="q" placeholder="Search..." type="search" />
+                        <input name="q" placeholder="Search..." type="search" ref={searchInputRef} onChange={searchHandler}/>
                     </form>
                     {authState}
                     <li className="dropdown">

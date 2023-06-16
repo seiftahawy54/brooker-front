@@ -12,11 +12,10 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router";
 
-const UserHome = (props) => {
+const UserHome = ({ searchPosts, isFromSearch, isFromProfile }) => {
     const authContext = useContext(authState);
     const [posts, setPosts] = useState([]);
     const [favPosts, setFavPosts] = useState([]);
-    const [isPostFavStateChanged, setPostChange] = useState(0);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -42,15 +41,21 @@ const UserHome = (props) => {
         });
 
     useEffect(() => {
-
-    }, [])
-
-    useEffect(() => {
         if (authContext.isLoggedIn) {
-            fetchNormalPosts();
-            fetchFavPosts();
+            if (isFromSearch) {
+                setPosts(searchPosts);
+            } else {
+                fetchNormalPosts();
+                fetchFavPosts();
+            }
         }
     }, [authContext.isLoggedIn, favPosts]);
+
+    if (searchPosts) {
+        useEffect(() => {
+            setPosts(searchPosts);
+        }, [searchPosts]);
+    }
 
     const togglePostToFavHandler = async (e) => {
         const postId = e.target.getAttribute("data-post-id");
@@ -88,13 +93,13 @@ const UserHome = (props) => {
                 });
         }
 
-        fetchFavPosts()
+        fetchFavPosts();
     };
     const isPostFavourite = (postId) => {
         return favPosts.findIndex(post => post._id === postId) > -1;
     };
 
-    const getPostsToRender = location.pathname === "/favourite" || props.isFromProfile ? favPosts : posts;
+    const getPostsToRender = (location.pathname === "/favourite" || isFromProfile) ? favPosts : posts;
 
     const generatedPosts = getPostsToRender.map((post) => (
         <div className={`post place2 `} key={post._id}>
@@ -109,7 +114,7 @@ const UserHome = (props) => {
                 </div>
                 <div className="d-grid gap-2 d-md-flex justify-content-md-center">
                     {authContext?.userData?.data?.username === post.seller.username && (
-                        <button className="btn btn-primary me-md-2  " type="button">
+                        <button className="btn btn-primary me-md-2  " type="button" onClick={() => navigate(`/addPost?editMode=true&postId=${post._id}`)}>
                             Edit
                         </button>
                     )}
@@ -141,7 +146,7 @@ const UserHome = (props) => {
                         />
                     </Link>
                 </main>
-                <main>
+                <main className={'overflow-scroll'}>
                     {post.images.map((img, index) => (
                         <img
                             key={index}
